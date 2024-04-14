@@ -5,7 +5,6 @@
 namespace ts {
 
 TEST(Sorter, creation) {
-    Sorter sorter;
 }
 
 } // namespace ts

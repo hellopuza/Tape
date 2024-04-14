@@ -1,12 +1,35 @@
 #ifndef TAPE_HPP
 #define TAPE_HPP
 
+#include <fstream>
+
+#include "itape.hpp"
+
 namespace ts {
 
-class Tape final
+struct FileError : public std::runtime_error
+{
+    FileError(const std::string& what);
+};
+
+class Tape : public ITape<int32_t>
 {
 public:
-    Tape() = default;
+    explicit Tape(const char* fileName);
+
+    void moveForward() override;
+    void moveBackward() override;
+    void rewind() override;
+
+    pos_type getPosition() const override;
+
+    val_type read() const override;
+    void write(const val_type& val) override;
+
+    static pos_type cellSize();
+
+private:
+    std::fstream file_;
 };
 
 } // namespace ts
