@@ -12,6 +12,11 @@ struct FileError : public std::runtime_error
     FileError(const std::string& what);
 };
 
+struct OutOfBorder : public std::runtime_error
+{
+    OutOfBorder(const std::string& what);
+};
+
 class Tape : public ITape<int32_t>
 {
 public:
@@ -21,7 +26,8 @@ public:
     void moveBackward() override;
     void rewind() override;
 
-    pos_type getPosition() const override;
+    pos_type position() const override;
+    pos_type length() const override;
 
     val_type read() const override;
     void write(const val_type& val) override;
