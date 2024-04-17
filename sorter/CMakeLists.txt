@@ -1,8 +1,6 @@
-add_library(sorter)
-target_include_directories(sorter PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(sorter INTERFACE)
+target_include_directories(sorter INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-target_link_libraries(sorter PUBLIC tape)
-
-target_sources(sorter PRIVATE sorter.cpp)
+target_link_libraries(sorter INTERFACE tape)
 
 add_subdirectory(tests)
