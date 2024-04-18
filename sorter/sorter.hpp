@@ -1,5 +1,5 @@
-#ifndef SORTER_HPP
-#define SORTER_HPP
+#ifndef SORTER_SORTER_HPP
+#define SORTER_SORTER_HPP
 
 #include <tape/itape.hpp>
 #include <tape/utils.hpp>
@@ -27,13 +27,18 @@ public:
     void sort(tape_type*, tape_type*)
     {}
 
-    bool sortBlock(tape_type* src, tape_type* dst, tape_type::MoveDirection dir)
+    template <typename Compare>
+    bool sortBlock(
+        tape_type* src, tape_type* dst,
+        tape_type::MoveDirection srcDir,
+        tape_type::MoveDirection dstDir,
+        Compare comp)
     {
-        auto memEnd = copyToMem(src, memory_.begin(), memory_.end(), dir);
-        std::sort(memory_.begin(), memEnd);
-        memEnd = copyFromMem(memory_.begin(), memEnd, dst, dir);
+        auto memEnd = copyToMem(src, memory_.begin(), memory_.end(), srcDir);
+        std::sort(memory_.begin(), memEnd, comp);
+        memEnd = copyFromMem(memory_.begin(), memEnd, dst, dstDir);
 
-        bool endOfDst = memory_.begin() != memEnd;
+        bool endOfDst = memory_.end() != memEnd;
         return endOfDst;
     }
 
@@ -43,4 +48,4 @@ private:
 
 } // namespace ts
 
-#endif // SORTER_HPP
+#endif // SORTER_SORTER_HPP

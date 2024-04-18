@@ -15,7 +15,7 @@ using val_type = IntTape::val_type;
 using enum IntTape::MoveDirection;
 
 const char* FILENAME = "file";
-size_t FILESIZE = 1 << 16;
+const size_t FILESIZE = 1 << 16;
 
 struct UtilsTest : public ::testing::Test
 {
@@ -69,9 +69,10 @@ TEST_F(UtilsTest, copyFromMem)
 TEST_F(UtilsTest, createTempTape)
 {
     const size_t tempNumber = 11;
-    auto tempTape = createTempTape<val_type>(FILESIZE, tempNumber);
+    const size_t tapeLength = 1 << 8;
+    auto tempTape = createTempTape<val_type>(tapeLength, tempNumber);
 
-    ASSERT_EQ(tempTape.length(), FILESIZE / tempTape.cellSize());
+    ASSERT_EQ(tempTape.length(), tapeLength);
 }
 
 } // namespace ts

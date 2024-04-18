@@ -1,3 +1,6 @@
+#ifndef TAPE_UTILS_HPP
+#define TAPE_UTILS_HPP
+
 #include "itape.hpp"
 #include "tape.hpp"
 
@@ -46,12 +49,14 @@ static auto createFile(const char* filename, size_t size)
 }
 
 template <typename T>
-Tape<T> createTempTape(size_t filesize, size_t number)
+Tape<T> createTempTape(size_t tapeLength, size_t number)
 {
     static auto tempFilename = std::string("/tmp/tape");
     auto numberedName = tempFilename + std::to_string(number);
-    createFile(numberedName.c_str(), filesize);
+    createFile(numberedName.c_str(), tapeLength * sizeof(T));
     return Tape<T>(numberedName.c_str());
 }
 
 } // namespace ts
+
+#endif // TAPE_UTILS_HPP

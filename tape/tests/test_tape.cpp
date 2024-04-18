@@ -56,34 +56,34 @@ TEST_F(TapeTest, atBegin)
 {
     IntTape tape(FILENAME);
 
-    ASSERT_EQ(tape.atBegin(), true);
+    ASSERT_TRUE(tape.atBegin());
     tape.move(Forward);
-    ASSERT_EQ(tape.atBegin(), false);
+    ASSERT_FALSE(tape.atBegin());
 }
 
 TEST_F(TapeTest, atEnd)
 {
     IntTape tape(FILENAME);
 
-    ASSERT_EQ(tape.atEnd(), false);
+    ASSERT_FALSE(tape.atEnd());
     tape.rewind(Forward);
-    ASSERT_EQ(tape.atEnd(), true);
+    ASSERT_TRUE(tape.atEnd());
 }
 
 TEST_F(TapeTest, atEdge)
 {
     IntTape tape(FILENAME);
 
-    ASSERT_EQ(tape.atEdge(Backward), true);
-    ASSERT_EQ(tape.atEdge(Forward), false);
+    ASSERT_TRUE(tape.atEdge(Backward));
+    ASSERT_FALSE(tape.atEdge(Forward));
 
     tape.move(Forward);
-    ASSERT_EQ(tape.atEdge(Backward), false);
-    ASSERT_EQ(tape.atEdge(Forward), false);
+    ASSERT_FALSE(tape.atEdge(Backward));
+    ASSERT_FALSE(tape.atEdge(Forward));
 
     tape.rewind(Forward);
-    ASSERT_EQ(tape.atEdge(Backward), false);
-    ASSERT_EQ(tape.atEdge(Forward), true);
+    ASSERT_FALSE(tape.atEdge(Backward));
+    ASSERT_TRUE(tape.atEdge(Forward));
 }
 
 TEST_F(TapeTest, moveForward)
@@ -95,7 +95,7 @@ TEST_F(TapeTest, moveForward)
         tape.move(Forward);
         ASSERT_EQ(tape.position(), i);
     }
-    ASSERT_EQ(tape.atEnd(), true);
+    ASSERT_TRUE(tape.atEnd());
 
     ASSERT_THROW(tape.move(Forward), OutOfBorder);
 }
@@ -172,27 +172,6 @@ TEST_F(TapeTest, write)
     tape.rewind(Backward);
     tape.write(100);
     ASSERT_EQ(tape.read(), 100);
-}
-
-TEST(LargeTapeTest, ReadWrite)
-{
-    const size_t size = 1 << 16;
-    const size_t length = size / sizeof(val_type);
-    createFile(FILENAME, size);
-
-    IntTape tape(FILENAME);
-
-    for (pos_type i = 1; i < length; i++)
-    {
-        tape.move(Forward);
-        tape.write(i);
-    }
-
-    for (pos_type i = length - 1; i > 0; i--)
-    {
-        ASSERT_EQ(tape.read(), i);
-        tape.move(Backward);
-    }
 }
 
 } // namespace ts

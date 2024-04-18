@@ -1,5 +1,5 @@
-#ifndef TAPE_HPP
-#define TAPE_HPP
+#ifndef TAPE_TAPE_HPP
+#define TAPE_TAPE_HPP
 
 #include <fstream>
 
@@ -133,4 +133,4 @@ private:
 
 } // namespace ts
 
-#endif // TAPE_HPP
+#endif // TAPE_TAPE_HPP
