@@ -17,9 +17,9 @@ using enum IntTape::MoveDirection;
 const char* FILENAME = "file";
 const size_t FILESIZE = 1 << 16;
 
-struct UtilsTest : public ::testing::Test
+struct TapeUtils : public ::testing::Test
 {
-    UtilsTest()
+    TapeUtils()
     {
         createFile(FILENAME, FILESIZE);
     }
@@ -27,7 +27,7 @@ struct UtilsTest : public ::testing::Test
 
 } // namespace
 
-TEST_F(UtilsTest, copyToMem)
+TEST_F(TapeUtils, copyToMem)
 {
     IntTape tape(FILENAME);
     for (; !tape.atEnd(); tape.move(Forward))
@@ -37,7 +37,7 @@ TEST_F(UtilsTest, copyToMem)
     tape.rewind(Backward);
 
     std::vector<val_type> mem(tape.length());
-    ASSERT_EQ(copyToMem(&tape, mem.begin(), mem.end(), Forward), mem.end());
+    copyToMem(&tape, mem.begin(), mem.end(), Forward);
     tape.rewind(Backward);
 
     for (; !tape.atEnd(); tape.move(Forward))
@@ -47,7 +47,7 @@ TEST_F(UtilsTest, copyToMem)
     ASSERT_EQ(mem[tape.position()], tape.read());
 }
 
-TEST_F(UtilsTest, copyFromMem)
+TEST_F(TapeUtils, copyFromMem)
 {
     IntTape tape(FILENAME);
     std::vector<val_type> mem(tape.length());
@@ -56,7 +56,7 @@ TEST_F(UtilsTest, copyFromMem)
         mem[i] = i;
     }
 
-    ASSERT_EQ(copyFromMem(mem.begin(), mem.end(), &tape, Forward), mem.end());
+    copyFromMem(&tape, mem.begin(), mem.end(), Forward);
     tape.rewind(Backward);
 
     for (; !tape.atEnd(); tape.move(Forward))
@@ -66,7 +66,7 @@ TEST_F(UtilsTest, copyFromMem)
     ASSERT_EQ(tape.read(), mem[tape.position()]);
 }
 
-TEST_F(UtilsTest, createTempTape)
+TEST_F(TapeUtils, createTempTape)
 {
     const size_t tempNumber = 11;
     const size_t tapeLength = 1 << 8;

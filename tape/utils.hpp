@@ -8,36 +8,34 @@
 
 namespace ts {
 
-template <typename T, typename It>
-It copyToMem(ITape<T>* src, It dFirst, It dLast, typename ITape<T>::MoveDirection dir)
+template <typename T, typename It, typename Dir = typename ITape<T>::MoveDirection>
+void copyToMem(ITape<T>* src, It dFirst, It dLast, Dir dir)
 {
-    for (; dFirst != dLast; ++dFirst)
+    while (dFirst != dLast)
     {
         *dFirst = src->read();
-        if (src->atEdge(dir))
+        ++dFirst;
+
+        if (!((dFirst == dLast) && src->atEdge(dir)))
         {
-            ++dFirst;
-            break;
+            src->move(dir);
         }
-        src->move(dir);
     }
-    return dFirst;
 }
 
-template <typename T, typename It>
-It copyFromMem(It sFirst, It sLast, ITape<T>* dst, typename ITape<T>::MoveDirection dir)
+template <typename T, typename It, typename Dir = typename ITape<T>::MoveDirection>
+void copyFromMem(ITape<T>* dst, It sFirst, It sLast, Dir dir)
 {
-    for (; sFirst != sLast; ++sFirst)
+    while (sFirst != sLast)
     {
         dst->write(*sFirst);
-        if (dst->atEdge(dir))
+        ++sFirst;
+
+        if (!((sFirst == sLast) && dst->atEdge(dir)))
         {
-            ++sFirst;
-            break;
+            dst->move(dir);
         }
-        dst->move(dir);
     }
-    return sFirst;
 }
 
 static auto createFile(const char* filename, size_t size)

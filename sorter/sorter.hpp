@@ -2,7 +2,7 @@
 #define SORTER_SORTER_HPP
 
 #include <tape/itape.hpp>
-#include <tape/utils.hpp>
+#include <sorter/utils.hpp>
 
 #include <algorithm>
 
@@ -24,22 +24,18 @@ public:
         : memory_(memsize)
     {}
 
-    void sort(tape_type*, tape_type*)
+    void sort(ITape<T>*, ITape<T>*)
     {}
 
-    template <typename Compare>
-    bool sortBlock(
-        tape_type* src, tape_type* dst,
-        tape_type::MoveDirection srcDir,
-        tape_type::MoveDirection dstDir,
+    template <typename Compare, typename Dir = typename ITape<T>::MoveDirection>
+    void sortBlock(
+        ITape<T>* src, ITape<T>* dst,
+        Dir srcDir, Dir dstDir,
         Compare comp)
     {
-        auto memEnd = copyToMem(src, memory_.begin(), memory_.end(), srcDir);
-        std::sort(memory_.begin(), memEnd, comp);
-        memEnd = copyFromMem(memory_.begin(), memEnd, dst, dstDir);
-
-        bool endOfDst = memory_.end() != memEnd;
-        return endOfDst;
+        copyToMem(src, memory_.begin(), memory_.end(), srcDir);
+        std::sort(memory_.begin(), memory_.end(), comp);
+        copyFromMem(dst, memory_.begin(), memory_.end(), dstDir);
     }
 
 private:

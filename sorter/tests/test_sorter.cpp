@@ -32,12 +32,11 @@ TEST(IntSorter, sortBlock) {
     auto srcTape = createRandomIntTape("src_tape", TAPE_LEN);
     auto dstTape = createTempTape<val_type>(TAPE_LEN, 0);
 
-    ASSERT_FALSE(sorter.sortBlock(&srcTape, &dstTape, Forward, Forward, std::less<val_type>()));
-    ASSERT_TRUE(isTapeSorted(&dstTape, 0, MEMSIZE - 1, std::less<val_type>()));
+    sorter.sortBlock(&srcTape, &dstTape, Forward, Forward, std::less<val_type>());
+    ASSERT_TRUE(isTapeSorted(&dstTape, 0lu, MEMSIZE - 1, std::less<val_type>()));
 
-    dstTape.move(Backward);
-    ASSERT_TRUE(sorter.sortBlock(&srcTape, &dstTape, Forward, Backward, std::greater<val_type>()));
-    ASSERT_TRUE(isTapeSorted(&dstTape, MEMSIZE - 1, 0, std::greater<val_type>()));
+    sorter.sortBlock(&srcTape, &dstTape, Forward, Backward, std::greater<val_type>());
+    ASSERT_TRUE(isTapeSorted(&dstTape, MEMSIZE - 1, 0lu, std::greater<val_type>()));
 }
 
 } // namespace ts

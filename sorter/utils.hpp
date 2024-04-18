@@ -30,12 +30,8 @@ static auto createRandomIntTape(const char* filename, size_t numbersAmount)
     return Tape<int32_t>(filename);
 }
 
-template <typename T, typename Compare>
-static bool isTapeSorted(
-    ITape<T>* tape,
-    typename ITape<T>::pos_type begin,
-    typename ITape<T>::pos_type end,
-    Compare comp)
+template <typename T, typename Compare, typename Pos = typename ITape<T>::pos_type>
+bool isTapeSorted(ITape<T>* tape, Pos begin, Pos end, Compare comp)
 {
     using ITape<T>::MoveDirection::Forward;
     using ITape<T>::MoveDirection::Backward;
@@ -55,6 +51,47 @@ static bool isTapeSorted(
         prev_val = val;
     }
     return !comp(tape->read(), prev_val);
+}
+
+template <typename T>
+struct TapeChunk
+{
+    using Dir = typename ITape<T>::MoveDirection;
+    using EndPos = typename ITape<T>::pos_type;
+
+    ITape<T>* tape;
+    Dir dir;
+    EndPos end;
+};
+
+template <typename T, typename Compare, typename Dir = typename TapeChunk<T>::Dir>
+void mergeTapes(TapeChunk<T> src[2], ITape<T>* dst, Dir dstDir, Compare comp)
+{
+    using val_type = typename ITape<T>::val_type;
+
+    while (true)
+    {
+        val_type val[2] = {src[0].tape->read(), src[1].tape->read()};
+        auto res = static_cast<int>(comp(val[0], val[1]));
+
+        dst->write(val[res]);
+
+        if (  (src[0].tape->position() == src[0].end)
+           && (src[1].tape->position() == src[1].end))
+        {
+            break;
+        }
+        dst->move(dstDir);
+
+        if (src[res].tape->position() != src[res].end)
+        {
+            src[res].tape->move(src[res].dir);
+        }
+        else
+        {
+            src[res] = src[1 - res];
+        }
+    }
 }
 
 } // namespace ts
