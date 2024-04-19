@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.14)
 
 project(TapeSorter VERSION 0.1 LANGUAGES CXX)
 
@@ -6,12 +6,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -Werror -Wshadow")
 
-find_package(GTest REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+    gtest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.14.0
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+set(BUILD_GTEST ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(gtest)
 
 function(add_test_module MODULE_NAME)
     add_library(${MODULE_NAME}_test)
     target_link_libraries(${MODULE_NAME}_test PUBLIC
-        ${GTEST_LIBRARIES}
+        gtest gtest_main
         ${MODULE_NAME}
     )
 

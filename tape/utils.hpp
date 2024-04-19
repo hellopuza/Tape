@@ -8,8 +8,8 @@
 
 namespace ts {
 
-template <typename T, typename It, typename Dir = typename ITape<T>::MoveDirection>
-void copyToMem(ITape<T>* src, It dFirst, It dLast, Dir dir)
+template <typename T, typename It, typename Direction = typename ITape<T>::MoveDirection>
+void copyToMem(ITape<T>* src, It dFirst, It dLast, Direction dir)
 {
     while (dFirst != dLast)
     {
@@ -23,8 +23,8 @@ void copyToMem(ITape<T>* src, It dFirst, It dLast, Dir dir)
     }
 }
 
-template <typename T, typename It, typename Dir = typename ITape<T>::MoveDirection>
-void copyFromMem(ITape<T>* dst, It sFirst, It sLast, Dir dir)
+template <typename T, typename It, typename Direction = typename ITape<T>::MoveDirection>
+void copyFromMem(ITape<T>* dst, It sFirst, It sLast, Direction dir)
 {
     while (sFirst != sLast)
     {

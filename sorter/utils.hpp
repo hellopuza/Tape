@@ -30,68 +30,67 @@ static auto createRandomIntTape(const char* filename, size_t numbersAmount)
     return Tape<int32_t>(filename);
 }
 
-template <typename T, typename Compare, typename Pos = typename ITape<T>::pos_type>
-bool isTapeSorted(ITape<T>* tape, Pos begin, Pos end, Compare comp)
+template <typename T>
+struct TapeDirected
 {
-    using ITape<T>::MoveDirection::Forward;
-    using ITape<T>::MoveDirection::Backward;
+    using Direction = typename ITape<T>::MoveDirection;
 
-    auto dir = tape->position() < begin ? Forward : Backward;
-    for (; tape->position() != begin; tape->move(dir));
-
-    dir = end > begin ? Forward : Backward;
-    auto prev_val = tape->read();
-    for (; tape->position() != end; tape->move(dir))
-    {
-        auto val = tape->read();
-        if (comp(val, prev_val))
-        {
-            return false;
-        }
-        prev_val = val;
-    }
-    return !comp(tape->read(), prev_val);
-}
+    ITape<T>* tape;
+    Direction dir;
+};
 
 template <typename T>
 struct TapeChunk
 {
-    using Dir = typename ITape<T>::MoveDirection;
+    using Direction = typename ITape<T>::MoveDirection;
     using EndPos = typename ITape<T>::pos_type;
 
     ITape<T>* tape;
-    Dir dir;
+    Direction dir;
     EndPos end;
 };
 
-template <typename T, typename Compare, typename Dir = typename TapeChunk<T>::Dir>
-void mergeTapes(TapeChunk<T> src[2], ITape<T>* dst, Dir dstDir, Compare comp)
+template <typename T, typename Compare>
+void mergeTapeChunks(TapeChunk<T> src[2], TapeDirected<T> dst, Compare comp)
 {
     using val_type = typename ITape<T>::val_type;
 
+    val_type val[2] = {src[0].tape->read(), src[1].tape->read()};
+    int n;
     while (true)
     {
-        val_type val[2] = {src[0].tape->read(), src[1].tape->read()};
-        auto res = static_cast<int>(comp(val[0], val[1]));
+        n = static_cast<int>(!comp(val[0], val[1]));
+        dst.tape->write(val[n]);
+        dst.tape->move(dst.dir);
 
-        dst->write(val[res]);
+        if (src[n].tape->position() == src[n].end)
+        {
+            n = 1 - n;
+            break;
+        }
 
-        if (  (src[0].tape->position() == src[0].end)
-           && (src[1].tape->position() == src[1].end))
+        src[n].tape->move(src[n].dir);
+        val[n] = src[n].tape->read();
+    }
+
+    while (true)
+    {
+        dst.tape->write(src[n].tape->read());
+        if (!dst.tape->atEdge(dst.dir))
+        {
+            dst.tape->move(dst.dir);
+        }
+        if (src[n].tape->position() == src[n].end)
         {
             break;
         }
-        dst->move(dstDir);
-
-        if (src[res].tape->position() != src[res].end)
-        {
-            src[res].tape->move(src[res].dir);
-        }
-        else
-        {
-            src[res] = src[1 - res];
-        }
+        src[n].tape->move(src[n].dir);
     }
+}
+
+template <typename T, typename Compare>
+void mergeTapes(TapeDirected<T>[2] src, TapeDirected<T>[2] dst, auto blockSize, Compare comp)
+{
 }
 
 } // namespace ts
