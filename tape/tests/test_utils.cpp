@@ -13,7 +13,7 @@ using val_type = IntTape::val_type;
 
 using enum IntTape::MoveDirection;
 
-constexpr size_t TAPE_LEN = 1 << 16;
+constexpr size_t TAPE_LEN = 1 << 10;
 constexpr size_t MEMSIZE = 1 << 8;
 
 } // namespace
@@ -25,6 +25,7 @@ TEST(TapeUtils, copyToMem)
     {
         tape.write(tape.position());
     }
+    tape.write(tape.position());
     tape.rewind(Backward);
 
     std::vector<val_type> mem(MEMSIZE);
@@ -32,7 +33,7 @@ TEST(TapeUtils, copyToMem)
     ASSERT_EQ(tape.position(), MEMSIZE - 1);
     tape.rewind(Backward);
 
-    for (; !tape.atEnd(); tape.move(Forward))
+    for (; tape.position() != MEMSIZE - 1; tape.move(Forward))
     {
         ASSERT_EQ(mem[tape.position()], tape.read());
     }

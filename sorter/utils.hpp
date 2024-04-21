@@ -97,16 +97,15 @@ size_t mergeTapes(ITape<T>* src[2], ITape<T>* dst[2], auto blockSize, Compare co
 
         mergeTapeChunks(src, end, dst[0], comp);
         chunksNumber++;
-        dst[0]->move(Forward);
 
-        if (dst[0]->length() - dst[0]->position() < blockSize * 2)
+        if (dst[0]->length() - dst[0]->position() - 1 < blockSize * 2)
         {
-            dst[0]->move(Backward);
             break;
         }
 
         src[0]->move(Backward);
         src[1]->move(Backward);
+        dst[0]->move(Forward);
     }
 
     if (end[0] == 0)

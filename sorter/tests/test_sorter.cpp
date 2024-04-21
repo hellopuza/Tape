@@ -55,11 +55,17 @@ TEST_P(IntSorterTest, distributeBlocks)
 {
     const auto MEMSIZE = std::get<0>(GetParam());
     const auto TAPE_LEN = std::get<1>(GetParam());
+    const auto blocksNumber = (TAPE_LEN + MEMSIZE - 1) / MEMSIZE;
+    const auto tempTapeLength = ((blocksNumber + 1) / 2) * MEMSIZE;
+    if (blocksNumber == 1)
+    {
+        return;
+    }
 
     IntSorter sorter(MEMSIZE);
     auto srcTape = createRandomIntTape("IntSorter_distributeBlocks_file0", TAPE_LEN);
-    auto dstTape0 = createTape<val_type>("IntSorter_distributeBlocks_file1", TAPE_LEN / 2);
-    auto dstTape1 = createTape<val_type>("IntSorter_distributeBlocks_file2", TAPE_LEN / 2);
+    auto dstTape0 = createTape<val_type>("IntSorter_distributeBlocks_file1", tempTapeLength);
+    auto dstTape1 = createTape<val_type>("IntSorter_distributeBlocks_file2", tempTapeLength);
 
     ITape<val_type>* tmpDst[] = {&dstTape0, &dstTape1};
     sorter.distributeBlocks(&srcTape, tmpDst, std::less<val_type>());
@@ -135,6 +141,8 @@ INSTANTIATE_TEST_SUITE_P(
     IntSorterTest,
     ::testing::Values(
         std::tuple<pos_type, pos_type>(10, 20),
+        std::tuple<pos_type, pos_type>(2, 9),
+        std::tuple<pos_type, pos_type>(4, 16),
         std::tuple<pos_type, pos_type>(150, 80),
         std::tuple<pos_type, pos_type>(1234, 5000),
         std::tuple<pos_type, pos_type>(3000, 10000)

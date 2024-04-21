@@ -25,6 +25,27 @@ TEST(SorterUtils, createRandomIntTape)
     ASSERT_EQ(tempTape.length(), TAPE_LEN);
 }
 
+TEST(SorterUtils, copy)
+{
+    auto srcTape = createRandomIntTape("SorterUtils_copy_file0", TAPE_LEN);
+    auto dstTape = createTape<val_type>("SorterUtils_mergeTapeChunks_file1", TAPE_LEN);
+
+    std::vector<val_type> testVec(dstTape.length());
+    copyToMem(&srcTape, testVec.begin(), testVec.begin() + dstTape.length());
+    copy(&srcTape, &dstTape);
+    ASSERT_EQ(srcTape.position(), 0);
+    ASSERT_EQ(dstTape.position(), dstTape.length() - 1);
+
+    for (auto val : testVec)
+    {
+        ASSERT_EQ(dstTape.read(), val);
+        if (!dstTape.atBegin())
+        {
+            dstTape.move(Backward);
+        }
+    }
+}
+
 TEST(SorterUtils, mergeTapeChunks)
 {
     auto srcTape0 = createTape<val_type>("SorterUtils_mergeTapeChunks_file0", TAPE_LEN);
