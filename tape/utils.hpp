@@ -12,7 +12,7 @@ namespace ts {
 template <typename T, typename It>
 void copyToMem(ITape<T>* src, It dFirst, It dLast)
 {
-    using ITape<T>::MoveDirection::Forward;
+    using MoveDirection::Forward;
     while (dFirst != dLast)
     {
         *dFirst = src->read();
@@ -28,7 +28,7 @@ void copyToMem(ITape<T>* src, It dFirst, It dLast)
 template <typename T, typename It>
 void copyFromMem(ITape<T>* dst, It sFirst, It sLast)
 {
-    using ITape<T>::MoveDirection::Forward;
+    using MoveDirection::Forward;
     while (sFirst != sLast)
     {
         dst->write(*sFirst);

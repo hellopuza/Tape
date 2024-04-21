@@ -11,7 +11,7 @@ using IntTape = Tape<int32_t>;
 using pos_type = IntTape::pos_type;
 using val_type = IntTape::val_type;
 
-using enum IntTape::MoveDirection;
+using enum MoveDirection;
 
 const char* FILENAME = "file";
 const std::vector<val_type> FILE_CONTENT = {1, 2, 3, 4, 5, 6, 7, 8};

@@ -13,8 +13,7 @@ Tape<int32_t> createRandomIntTape(const char* filename, size_t numbersAmount);
 template <typename T, typename EndPos = typename ITape<T>::pos_type>
 void copy(ITape<T>* src, ITape<T>* dst, EndPos end = 0)
 {
-    using ITape<T>::MoveDirection::Forward;
-    using ITape<T>::MoveDirection::Backward;
+    using enum MoveDirection;
 
     while (true)
     {
@@ -32,8 +31,7 @@ template <typename T, typename Compare, typename EndPos = typename ITape<T>::pos
 void mergeTapeChunks(ITape<T>* src[2], EndPos end[2], ITape<T>* dst, Compare comp)
 {
     using val_type = typename ITape<T>::val_type;
-    using ITape<T>::MoveDirection::Forward;
-    using ITape<T>::MoveDirection::Backward;
+    using enum MoveDirection;
 
     val_type val[2] = {src[0]->read(), src[1]->read()};
     int n;
@@ -57,72 +55,63 @@ void mergeTapeChunks(ITape<T>* src[2], EndPos end[2], ITape<T>* dst, Compare com
 }
 
 template <typename T, typename Compare>
-size_t mergeTapes(ITape<T>* src[2], ITape<T>* dst[2], auto blockSize, Compare comp)
+void mergeTapes(ITape<T>* src[2], ITape<T>* dst[2], Tape<size_t>* sizes[2], Compare comp)
 {
     using EndPos = typename ITape<T>::pos_type;
-    using ITape<T>::MoveDirection::Forward;
-    using ITape<T>::MoveDirection::Backward;
+    using enum MoveDirection;
 
-    EndPos end[2];
-    size_t chunksNumber = 0;
+    bool firsIt[2] = {true, true};
+    auto updateDst = [&]() {
+        if (!firsIt[0])
+        {
+            dst[0]->move(Forward);
+        }
+        firsIt[0] = false;
+        std::swap(firsIt[0], firsIt[1]);
+    };
+
     while (true)
     {
-        end[0] = src[0]->position() <= blockSize ? 0 : src[0]->position() - blockSize + 1;
-        end[1] = (src[1]->position() / blockSize) * blockSize;
+        updateDst();
 
-        if (end[0] == 0 && end[1] == 0)
-        {
-            return 1;
-        }
+        auto size0 = sizes[0]->read();
+        sizes[0]->move(Backward);
+        auto size1 = sizes[0]->read();
+        sizes[1]->write(size0 + size1);
 
+        EndPos end[] = {
+            src[0]->position() - size0 + 1,
+            src[1]->position() - size1 + 1
+        };
         mergeTapeChunks(src, end, dst[0], comp);
-        chunksNumber++;
 
-        if (dst[0]->length() - dst[0]->position() - 1 < blockSize * 2)
+        if (src[0]->atBegin() || src[1]->atBegin())
         {
             break;
         }
 
         src[0]->move(Backward);
         src[1]->move(Backward);
-        dst[0]->move(Forward);
+        sizes[0]->move(Backward);
+        sizes[1]->move(Forward);
+        std::swap(dst[0], dst[1]);
     }
 
-    if (end[0] == 0)
+    for (int i = 0; i < 2; i++)
     {
-        src[1]->move(Backward);
-        copy(src[1], dst[1]);
-        chunksNumber++;
-        return chunksNumber;
-    }
-
-    while (true)
-    {
-        src[0]->move(Backward);
-        src[1]->move(Backward);
-
-        end[0] = (src[0]->position() / blockSize) * blockSize;
-        end[1] = (src[1]->position() / blockSize) * blockSize;
-
-        mergeTapeChunks(src, end, dst[1], comp);
-        chunksNumber++;
-
-        if (src[1]->atBegin())
+        if (!src[i]->atBegin())
         {
-            break;
+            std::swap(dst[0], dst[1]);
+            updateDst();
+
+            src[i]->move(Backward);
+            sizes[0]->move(Backward);
+            sizes[1]->move(Forward);
+            sizes[1]->write(sizes[0]->read());
+            copy(src[i], dst[0]);
         }
-        dst[1]->move(Forward);
     }
-
-    if (!src[0]->atBegin())
-    {
-        chunksNumber++;
-        src[0]->move(Backward);
-        dst[1]->move(Forward);
-        copy(src[0], dst[1]);
-    }
-
-    return chunksNumber;
+    std::swap(sizes[0], sizes[1]);
 }
 
 } // namespace ts

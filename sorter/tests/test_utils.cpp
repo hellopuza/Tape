@@ -13,7 +13,7 @@ using IntTape = Tape<int32_t>;
 using pos_type = IntTape::pos_type;
 using val_type = IntTape::val_type;
 
-using enum IntTape::MoveDirection;
+using enum MoveDirection;
 
 constexpr size_t TAPE_LEN = 1001;
 

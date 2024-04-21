@@ -5,14 +5,14 @@
 
 namespace ts {
 
+enum class MoveDirection { Forward, Backward };
+
 template <typename T>
 class ITape
 {
 public:
     using pos_type = size_t;
     using val_type = T;
-
-    enum class MoveDirection { Forward, Backward };
 
     ITape() = default;
 

@@ -29,7 +29,6 @@ class Tape : public ITape<T>
 public:
     using pos_type = typename ITape<T>::pos_type;
     using val_type = typename ITape<T>::val_type;
-    using MoveDirection = typename ITape<T>::MoveDirection;
     using time_type = Time;
 
     struct Latency

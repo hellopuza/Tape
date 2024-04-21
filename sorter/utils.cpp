@@ -8,7 +8,7 @@ void createRandomIntFile(const char* filename, size_t numbersAmount)
 
     std::random_device randD;
     std::mt19937 randMT(randD());
-    std::uniform_int_distribution<int32_t> range(0, 100);
+    std::uniform_int_distribution<int32_t> range;
 
     for (size_t i = 0; i < numbersAmount; i++)
     {
