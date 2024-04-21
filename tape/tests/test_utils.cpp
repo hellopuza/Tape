@@ -1,7 +1,6 @@
-#include <gtest/gtest.h>
-
 #include <tape/utils.hpp>
-#include <tape/tape.hpp>
+
+#include <gtest/gtest.h>
 
 namespace ts {
 
@@ -14,30 +13,23 @@ using val_type = IntTape::val_type;
 
 using enum IntTape::MoveDirection;
 
-const char* FILENAME = "file";
-const size_t FILESIZE = 1 << 16;
-
-struct TapeUtils : public ::testing::Test
-{
-    TapeUtils()
-    {
-        createFile(FILENAME, FILESIZE);
-    }
-};
+constexpr size_t TAPE_LEN = 1 << 16;
+constexpr size_t MEMSIZE = 1 << 8;
 
 } // namespace
 
-TEST_F(TapeUtils, copyToMem)
+TEST(TapeUtils, copyToMem)
 {
-    IntTape tape(FILENAME);
+    auto tape = createTape<val_type>("TapeUtils_copyToMem_file0", TAPE_LEN);
     for (; !tape.atEnd(); tape.move(Forward))
     {
         tape.write(tape.position());
     }
     tape.rewind(Backward);
 
-    std::vector<val_type> mem(tape.length());
-    copyToMem(&tape, mem.begin(), mem.end(), Forward);
+    std::vector<val_type> mem(MEMSIZE);
+    copyToMem(&tape, mem.begin(), mem.end());
+    ASSERT_EQ(tape.position(), MEMSIZE - 1);
     tape.rewind(Backward);
 
     for (; !tape.atEnd(); tape.move(Forward))
@@ -47,16 +39,16 @@ TEST_F(TapeUtils, copyToMem)
     ASSERT_EQ(mem[tape.position()], tape.read());
 }
 
-TEST_F(TapeUtils, copyFromMem)
+TEST(TapeUtils, copyFromMem)
 {
-    IntTape tape(FILENAME);
+    auto tape = createTape<val_type>("TapeUtils_copyFromMem_file0", TAPE_LEN);
     std::vector<val_type> mem(tape.length());
     for (size_t i = 0; i < mem.size(); i++)
     {
         mem[i] = i;
     }
 
-    copyFromMem(&tape, mem.begin(), mem.end(), Forward);
+    copyFromMem(&tape, mem.begin(), mem.end());
     tape.rewind(Backward);
 
     for (; !tape.atEnd(); tape.move(Forward))
@@ -66,13 +58,19 @@ TEST_F(TapeUtils, copyFromMem)
     ASSERT_EQ(tape.read(), mem[tape.position()]);
 }
 
-TEST_F(TapeUtils, createTempTape)
+TEST(TapeUtils, createTape)
 {
-    const size_t tempNumber = 11;
-    const size_t tapeLength = 1 << 8;
-    auto tempTape = createTempTape<val_type>(tapeLength, tempNumber);
+    auto tape = createTape<val_type>("TapeUtils_createTape_file0", TAPE_LEN);
 
-    ASSERT_EQ(tempTape.length(), tapeLength);
+    ASSERT_EQ(tape.length(), TAPE_LEN);
+}
+
+TEST(TapeUtils, createTempTape)
+{
+    const size_t TAPE_LEN = 1 << 8;
+    auto tempTape = createTempTape<val_type>(TAPE_LEN);
+
+    ASSERT_EQ(tempTape.length(), TAPE_LEN);
 }
 
 } // namespace ts

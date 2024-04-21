@@ -1,7 +1,6 @@
-#include <gtest/gtest.h>
-
-#include <tape/tape.hpp>
 #include <tape/utils.hpp>
+
+#include <gtest/gtest.h>
 
 namespace ts {
 

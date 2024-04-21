@@ -4,36 +4,38 @@
 #include "itape.hpp"
 #include "tape.hpp"
 
-#include <fstream>
+#include <cstdio>
 
 namespace ts {
 
-template <typename T, typename It, typename Direction = typename ITape<T>::MoveDirection>
-void copyToMem(ITape<T>* src, It dFirst, It dLast, Direction dir)
+template <typename T, typename It>
+void copyToMem(ITape<T>* src, It dFirst, It dLast)
 {
+    using ITape<T>::MoveDirection::Forward;
     while (dFirst != dLast)
     {
         *dFirst = src->read();
         ++dFirst;
 
-        if (!((dFirst == dLast) && src->atEdge(dir)))
+        if (dFirst != dLast)
         {
-            src->move(dir);
+            src->move(Forward);
         }
     }
 }
 
-template <typename T, typename It, typename Direction = typename ITape<T>::MoveDirection>
-void copyFromMem(ITape<T>* dst, It sFirst, It sLast, Direction dir)
+template <typename T, typename It>
+void copyFromMem(ITape<T>* dst, It sFirst, It sLast)
 {
+    using ITape<T>::MoveDirection::Forward;
     while (sFirst != sLast)
     {
         dst->write(*sFirst);
         ++sFirst;
 
-        if (!((sFirst == sLast) && dst->atEdge(dir)))
+        if (sFirst != sLast)
         {
-            dst->move(dir);
+            dst->move(Forward);
         }
     }
 }
@@ -47,12 +49,21 @@ static auto createFile(const char* filename, size_t size)
 }
 
 template <typename T>
-Tape<T> createTempTape(size_t tapeLength, size_t number)
+Tape<T> createTape(const char* filename, size_t tapeLength)
 {
-    static auto tempFilename = std::string("/tmp/tape");
-    auto numberedName = tempFilename + std::to_string(number);
-    createFile(numberedName.c_str(), tapeLength * sizeof(T));
-    return Tape<T>(numberedName.c_str());
+    createFile(filename, tapeLength * sizeof(T));
+    return Tape<T>(filename);
+}
+
+template <typename T>
+Tape<T> createTempTape(size_t tapeLength)
+{
+    char name[L_tmpnam];
+    if (std::tmpnam(name))
+    {
+        return createTape<T>(name, tapeLength);
+    }
+    return createTape<T>("", tapeLength);
 }
 
 } // namespace ts

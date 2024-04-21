@@ -1,6 +1,8 @@
 #ifndef ITAPE_HPP
 #define ITAPE_HPP
 
+#include <cstddef>
+
 namespace ts {
 
 template <typename T>

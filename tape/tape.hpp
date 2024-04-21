@@ -1,9 +1,9 @@
 #ifndef TAPE_TAPE_HPP
 #define TAPE_TAPE_HPP
 
-#include <fstream>
-
 #include "itape.hpp"
+
+#include <fstream>
 
 namespace ts {
 

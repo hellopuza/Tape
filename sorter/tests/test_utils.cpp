@@ -1,11 +1,8 @@
+#include <sorter/utils.hpp>
+
 #include <gtest/gtest.h>
 #include <cstdlib>
 #include <functional>
-
-#include <iostream>
-
-#include <sorter/utils.hpp>
-#include <tape/tape.hpp>
 
 namespace ts {
 
@@ -18,50 +15,50 @@ using val_type = IntTape::val_type;
 
 using enum IntTape::MoveDirection;
 
-using IntTapeChunk = TapeChunk<val_type>;
-using IntTapeDirected = TapeDirected<val_type>;
-
-constexpr size_t TAPE_LEN = 1 << 4;
+constexpr size_t TAPE_LEN = 1001;
 
 } // namespace
 
-TEST(SorterUtils, createRandomIntTape) {
-    auto tempTape = createRandomIntTape("SorterUtils_file0", TAPE_LEN);
+TEST(SorterUtils, createRandomIntTape)
+{
+    auto tempTape = createRandomIntTape("SorterUtils_createRandomIntTape_file0", TAPE_LEN);
     ASSERT_EQ(tempTape.length(), TAPE_LEN);
 }
 
-TEST(SorterUtils, mergeTapeChunks) {
-    auto srcTape0 = createTempTape<val_type>(TAPE_LEN, 0);
-    auto srcTape1 = createTempTape<val_type>(TAPE_LEN / 2, 1);
-    auto dstTape = createTempTape<val_type>(srcTape0.length() + srcTape1.length(), 2);
+TEST(SorterUtils, mergeTapeChunks)
+{
+    auto srcTape0 = createTape<val_type>("SorterUtils_mergeTapeChunks_file0", TAPE_LEN);
+    auto srcTape1 = createTape<val_type>("SorterUtils_mergeTapeChunks_file1", TAPE_LEN / 2);
+    auto dstTape = createTape<val_type>("SorterUtils_mergeTapeChunks_file2", srcTape0.length() + srcTape1.length());
 
     std::vector<val_type> testVec;
 
     val_type val = 0;
-    for (; !srcTape0.atEnd(); srcTape0.move(Forward), val += rand() % 3)
+    for (srcTape0.rewind(Forward); !srcTape0.atBegin(); srcTape0.move(Backward), val += rand() % 3)
     {
         srcTape0.write(val);
         testVec.push_back(val);
     }
     srcTape0.write(val);
-    srcTape0.rewind(Backward);
     testVec.push_back(val);
+    srcTape0.rewind(Forward);
 
     val = 0;
-    for (; !srcTape1.atEnd(); srcTape1.move(Forward), val += rand() % 3)
+    for (srcTape1.rewind(Forward); !srcTape1.atBegin(); srcTape1.move(Backward), val += rand() % 3)
     {
         srcTape1.write(val);
         testVec.push_back(val);
     }
     srcTape1.write(val);
-    srcTape1.rewind(Backward);
     testVec.push_back(val);
+    srcTape1.rewind(Forward);
 
-    IntTapeChunk chunk[2] = {
-        IntTapeChunk{&srcTape0, Forward, srcTape0.length() - 1},
-        IntTapeChunk{&srcTape1, Forward, srcTape1.length() - 1}
-    };
-    mergeTapeChunks(chunk, IntTapeDirected{&dstTape, Forward}, std::less<val_type>());
+    ITape<val_type>* src[2] = {&srcTape0, &srcTape1};
+    ITape<val_type>::pos_type end[2] = {0, 0};
+    mergeTapeChunks(src, end, &dstTape, std::less<val_type>());
+    ASSERT_TRUE(srcTape0.atBegin());
+    ASSERT_TRUE(srcTape1.atBegin());
+    ASSERT_TRUE(dstTape.atEnd());
 
     std::sort(testVec.begin(), testVec.end(), std::less<val_type>());
     dstTape.rewind(Backward);
