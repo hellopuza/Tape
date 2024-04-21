@@ -5,7 +5,7 @@ A program for sorting tape-like files containing integers.
 ```
 mkdir build && cd build
 cmake ../
-make -j 
+make -j tape_sorter
 ```
 
 ## Building
