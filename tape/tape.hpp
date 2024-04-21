@@ -3,7 +3,9 @@
 
 #include "itape.hpp"
 
+#include <chrono>
 #include <fstream>
+#include <thread>
 
 namespace ts {
 
@@ -21,17 +23,29 @@ struct OutOfBorder : public std::runtime_error
     {}
 };
 
-template <typename T>
+template <typename T, typename Time = std::chrono::milliseconds>
 class Tape : public ITape<T>
 {
 public:
     using pos_type = typename ITape<T>::pos_type;
     using val_type = typename ITape<T>::val_type;
     using MoveDirection = typename ITape<T>::MoveDirection;
+    using time_type = Time;
 
-    explicit Tape(const char* fileName)
+    struct Latency
+    {
+        Time read;
+        Time write;
+        Time move;
+        Time rewind;
+
+        bool operator==(const Latency& rhs) const = default;
+    };
+
+    explicit Tape(const char* fileName, const Latency& latency = Latency())
         : file_(fileName, std::ios::binary | std::ios::in | std::ios::out)
         , length_((file_.seekg(0, std::ios_base::end), file_.tellg() / cellSize()))
+        , latency_(latency)
     {
         if (!file_.is_open())
         {
@@ -43,6 +57,7 @@ public:
 
     void move(MoveDirection dir) override
     {
+        std::this_thread::sleep_for(latency_.move);
         switch (dir)
         {
         case MoveDirection::Forward:
@@ -59,6 +74,7 @@ public:
 
     void rewind(MoveDirection dir) override
     {
+        std::this_thread::sleep_for(latency_.rewind);
         switch (dir)
         {
         case MoveDirection::Forward:
@@ -104,6 +120,8 @@ public:
 
     val_type read() const override
     {
+        std::this_thread::sleep_for(latency_.read);
+
         auto& file_ref = const_cast<std::fstream&>(file_);
         auto pos = file_ref.tellg();
 
@@ -116,6 +134,8 @@ public:
 
     void write(const val_type& val) override
     {
+        std::this_thread::sleep_for(latency_.write);
+
         auto pos = file_.tellg();
         file_.write(reinterpret_cast<const char*>(&val), cellSize());
         file_.seekg(pos);
@@ -129,6 +149,7 @@ public:
 private:
     std::fstream file_;
     pos_type length_;
+    Latency latency_;
 };
 
 } // namespace ts

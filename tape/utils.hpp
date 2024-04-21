@@ -5,6 +5,7 @@
 #include "tape.hpp"
 
 #include <cstdio>
+#include <iostream>
 
 namespace ts {
 
@@ -40,13 +41,7 @@ void copyFromMem(ITape<T>* dst, It sFirst, It sLast)
     }
 }
 
-static auto createFile(const char* filename, size_t size)
-{
-    std::ofstream file(filename, std::ios::binary | std::ios::out);
-    file.seekp(size - 1);
-    file.write("", 1);
-    return file;
-}
+std::ofstream createFile(const char* filename, size_t size);
 
 template <typename T>
 Tape<T> createTape(const char* filename, size_t tapeLength)
@@ -64,6 +59,21 @@ Tape<T> createTempTape(size_t tapeLength)
         return createTape<T>(name, tapeLength);
     }
     return createTape<T>("", tapeLength);
+}
+
+template <typename T>
+typename Tape<T>::Latency loadLatency(std::istream& in)
+{
+    size_t read, write, move, rewind;
+    in >> read >> write >> move >> rewind;
+
+    using Time = typename Tape<T>::time_type;
+    return typename Tape<T>::Latency(
+        Time(read),
+        Time(write),
+        Time(move),
+        Time(rewind)
+    );
 }
 
 } // namespace ts

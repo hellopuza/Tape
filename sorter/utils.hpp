@@ -7,28 +7,8 @@
 
 namespace ts {
 
-static auto createRandomIntFile(const char* filename, size_t numbersAmount)
-{
-    auto file = createFile(filename, numbersAmount * sizeof(int32_t));
-
-    std::random_device randD;
-    std::mt19937 randMT(randD());
-    std::uniform_int_distribution<int32_t> range(0, 100);
-
-    file.seekp(0);
-    for (size_t i = 0; i < numbersAmount; i++)
-    {
-        const int32_t val = range(randMT);
-        file.write(reinterpret_cast<const char*>(&val), sizeof(val));
-    }
-    return file;
-}
-
-static auto createRandomIntTape(const char* filename, size_t numbersAmount)
-{
-    createRandomIntFile(filename, numbersAmount);
-    return Tape<int32_t>(filename);
-}
+void createRandomIntFile(const char* filename, size_t numbersAmount);
+Tape<int32_t> createRandomIntTape(const char* filename, size_t numbersAmount);
 
 template <typename T, typename EndPos = typename ITape<T>::pos_type>
 void copy(ITape<T>* src, ITape<T>* dst, EndPos end = 0)

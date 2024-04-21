@@ -74,4 +74,20 @@ TEST(TapeUtils, createTempTape)
     ASSERT_EQ(tempTape.length(), TAPE_LEN);
 }
 
+TEST(TapeUtils, loadLatency)
+{
+    std::fstream file("/tmp/cfg_tape", std::ios::in | std::ios::out);
+    file << "1 2 3 4";
+    file.seekg(0);
+
+    using Time = Tape<val_type>::time_type;
+    auto lat = Tape<val_type>::Latency(
+        Time(1),
+        Time(2),
+        Time(3),
+        Time(4)
+    );
+    ASSERT_EQ(loadLatency<val_type>(file), lat);
+}
+
 } // namespace ts
