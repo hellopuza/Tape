@@ -8,7 +8,7 @@ cmake ../
 make -j tape_sorter
 ```
 
-## Building
+## Testing
 You can run all tests or partial ones.
 ```
 make -j test_all
@@ -16,6 +16,10 @@ make -j test_all
 
 make -j test_tape
 ./tape/tests/test_tape
+```
+Or run script.
+```
+./gen_and_check.sh path/to/tape_sorter file-size mem-size
 ```
 
 ## Usage
