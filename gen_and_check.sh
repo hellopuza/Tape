@@ -22,4 +22,4 @@ sorted_file_dec="$src_file.dec"
 hexdump -e '1/4 "%d" "\n"' $dst_file > $dst_file_dec
 hexdump -e '1/4 "%d" "\n"' $src_file | sort -n > $sorted_file_dec
 
-diff $dst_file_dec $sorted_file_dec &>/dev/null
+diff $dst_file_dec $sorted_file_dec
