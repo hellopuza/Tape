@@ -35,7 +35,7 @@ public:
             return;
         }
 
-        auto tempTapeLength = (blocksNumber / 2 + 1) * blockSize;
+        auto tempTapeLength = src->length();
         auto tape0 = tapeFactory(tempTapeLength);
         auto tape1 = tapeFactory(tempTapeLength);
         auto tape2 = tapeFactory(tempTapeLength);
