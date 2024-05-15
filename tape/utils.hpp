@@ -1,7 +1,6 @@
 #ifndef TAPE_UTILS_HPP
 #define TAPE_UTILS_HPP
 
-#include "itape.hpp"
 #include "tape.hpp"
 
 #include <cstdio>
@@ -42,6 +41,8 @@ void copyFromMem(ITape<T>* dst, It sFirst, It sLast)
 }
 
 std::ofstream createFile(const char* filename, size_t size);
+void createRandomIntFile(const char* filename, size_t numbersAmount);
+Tape<int32_t> createRandomIntTape(const char* filename, size_t numbersAmount);
 
 template <typename T>
 Tape<T> createTape(const char* filename, size_t tapeLength)
@@ -51,15 +52,18 @@ Tape<T> createTape(const char* filename, size_t tapeLength)
 }
 
 template <typename T>
-Tape<T> createTempTape(size_t tapeLength)
+struct TempTapeCreator
 {
-    char name[L_tmpnam];
-    if (std::tmpnam(name))
+    Tape<T> operator()(size_t tapeLength)
     {
-        return createTape<T>(name, tapeLength);
+        char name[L_tmpnam];
+        if (std::tmpnam(name))
+        {
+            return createTape<T>(name, tapeLength);
+        }
+        return createTape<T>("", tapeLength);
     }
-    return createTape<T>("", tapeLength);
-}
+};
 
 template <typename T>
 typename Tape<T>::Latency loadLatency(std::istream& in)

@@ -69,8 +69,15 @@ TEST(TapeUtils, createTape)
 TEST(TapeUtils, createTempTape)
 {
     const size_t TAPE_LEN = 1 << 8;
-    auto tempTape = createTempTape<val_type>(TAPE_LEN);
+    TempTapeCreator<val_type> creator;
+    auto tempTape = creator(TAPE_LEN);
 
+    ASSERT_EQ(tempTape.length(), TAPE_LEN);
+}
+
+TEST(TapeUtils, createRandomIntTape)
+{
+    auto tempTape = createRandomIntTape("TapeUtils_createRandomIntTape_file0", TAPE_LEN);
     ASSERT_EQ(tempTape.length(), TAPE_LEN);
 }
 

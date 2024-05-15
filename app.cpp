@@ -1,4 +1,5 @@
 #include <sorter/sorter.hpp>
+#include <tape/utils.hpp>
 
 #include <iostream>
 
@@ -39,8 +40,8 @@ int main(int argc, char** argv)
         memsize = std::strtoul(argv[3], &end, 10);
     }
 
-    ts::Sorter<val_type> sorter(memsize);
-    sorter.sort(&srcTape, &dstTape, ts::createTempTape<val_type>, std::less<val_type>());
+    ts::Sorter<val_type, ts::TempTapeCreator> sorter(memsize);
+    sorter.sort(&srcTape, &dstTape, std::less<val_type>());
 
     return 0;
 }

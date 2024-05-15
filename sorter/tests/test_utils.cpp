@@ -1,4 +1,5 @@
 #include <sorter/utils.hpp>
+#include <tape/utils.hpp>
 
 #include <gtest/gtest.h>
 #include <cstdlib>
@@ -18,12 +19,6 @@ using enum MoveDirection;
 constexpr size_t TAPE_LEN = 1001;
 
 } // namespace
-
-TEST(SorterUtils, createRandomIntTape)
-{
-    auto tempTape = createRandomIntTape("SorterUtils_createRandomIntTape_file0", TAPE_LEN);
-    ASSERT_EQ(tempTape.length(), TAPE_LEN);
-}
 
 TEST(SorterUtils, copy)
 {

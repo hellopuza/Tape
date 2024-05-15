@@ -3,13 +3,12 @@
 
 #include <sorter/utils.hpp>
 
-#include <algorithm>
 #include <bit>
 #include <functional>
 
 namespace ts {
 
-template <typename T>
+template <typename T, template <typename> typename Factory>
 class Sorter final
 {
 public:
@@ -24,8 +23,8 @@ public:
         : memory_(memsize)
     {}
 
-    template <typename Factory, typename Compare>
-    void sort(ITape<T>* src, ITape<T>* dst, Factory tapeFactory, Compare comp)
+    template <typename Compare>
+    void sort(ITape<T>* src, ITape<T>* dst, Compare comp)
     {
         auto blockSize = memory_.size();
         auto blocksNumber = (src->length() + blockSize - 1) / blockSize;
@@ -36,18 +35,18 @@ public:
         }
 
         auto tempTapeLength = src->length();
-        auto tape0 = tapeFactory(tempTapeLength);
-        auto tape1 = tapeFactory(tempTapeLength);
-        auto tape2 = tapeFactory(tempTapeLength);
-        auto tape3 = tapeFactory(tempTapeLength);
+        auto tape0 = createTape(tempTapeLength);
+        auto tape1 = createTape(tempTapeLength);
+        auto tape2 = createTape(tempTapeLength);
+        auto tape3 = createTape(tempTapeLength);
 
         ITape<T>* tmpSrc[] = {&tape0, &tape1};
         ITape<T>* tmpDst[] = {&tape2, &tape3};
 
-        auto sizes0 = createTempTape<size_t>(blocksNumber);
-        auto sizes1 = createTempTape<size_t>(blocksNumber);
+        auto sizes0 = createSizesTape(blocksNumber);
+        auto sizes1 = createSizesTape(blocksNumber);
 
-        Tape<size_t>* sizes[] = {&sizes0, &sizes1};
+        ITape<size_t>* sizes[] = {&sizes0, &sizes1};
 
         bool invComp = std::bit_width(blocksNumber - 1) % 2 == 1;
         auto newComp = [&](const auto& a, const auto& b) {
@@ -70,7 +69,7 @@ public:
     }
 
     template <typename Compare>
-    void distributeBlocks(ITape<T>* src, ITape<T>* dst[2], Tape<size_t>* sizes, Compare comp)
+    void distributeBlocks(ITape<T>* src, ITape<T>* dst[2], ITape<size_t>* sizes, Compare comp)
     {
         bool firsIt[2] = {true, true};
         while (true)
@@ -111,6 +110,8 @@ public:
 
 private:
     std::vector<val_type> memory_;
+    Factory<T> createTape;
+    Factory<size_t> createSizesTape;
 };
 
 } // namespace ts

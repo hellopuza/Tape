@@ -1,14 +1,11 @@
 #ifndef SORTER_UTILS_HPP
 #define SORTER_UTILS_HPP
 
-#include <tape/utils.hpp>
+#include <tape/itape.hpp>
 
-#include <random>
+#include <algorithm>
 
 namespace ts {
-
-void createRandomIntFile(const char* filename, size_t numbersAmount);
-Tape<int32_t> createRandomIntTape(const char* filename, size_t numbersAmount);
 
 template <typename T, typename EndPos = typename ITape<T>::pos_type>
 void copy(ITape<T>* src, ITape<T>* dst, EndPos end = 0)
@@ -55,7 +52,7 @@ void mergeTapeChunks(ITape<T>* src[2], EndPos end[2], ITape<T>* dst, Compare com
 }
 
 template <typename T, typename Compare>
-void mergeTapes(ITape<T>* src[2], ITape<T>* dst[2], Tape<size_t>* sizes[2], Compare comp)
+void mergeTapes(ITape<T>* src[2], ITape<T>* dst[2], ITape<size_t>* sizes[2], Compare comp)
 {
     using EndPos = typename ITape<T>::pos_type;
     using enum MoveDirection;

@@ -1,4 +1,5 @@
 #include <sorter/sorter.hpp>
+#include <tape/utils.hpp>
 
 #include <gtest/gtest.h>
 #include <functional>
@@ -15,7 +16,7 @@ using val_type = IntTape::val_type;
 
 using enum MoveDirection;
 
-using IntSorter = Sorter<val_type>;
+using IntSorter = Sorter<val_type, TempTapeCreator>;
 
 } // namespace
 
@@ -59,7 +60,7 @@ TEST_P(IntSorterTest, sort)
     IntSorter sorter(MEMSIZE);
     auto srcTape = createRandomIntTape("IntSorter_sort_file0", TAPE_LEN);
     auto dstTape = createTape<val_type>("IntSorter_sort_file1", TAPE_LEN);
-    sorter.sort(&srcTape, &dstTape, createTempTape<val_type>, std::less<val_type>());
+    sorter.sort(&srcTape, &dstTape, std::less<val_type>());
 
     std::vector<val_type> testVecSrc(TAPE_LEN);
     srcTape.rewind(Backward);
